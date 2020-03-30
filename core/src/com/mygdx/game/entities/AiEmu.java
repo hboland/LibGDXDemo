@@ -35,13 +35,13 @@ public class AiEmu {
     public float emuTime;
 
     public AiEmu(){
-        state = "despawned";
+        state = "alive";
         movementDirection = "none";
         isMoving = false;
-        timeUntilRespawn = 10 + random.nextInt(5);
+        timeUntilRespawn = 00 + random.nextInt(500);
         timeSinceDespawn = 0;
-        this.positionX = random.nextInt(400);
-        this.positionY = random.nextInt(200);
+        this.positionX = random.nextInt(430);
+        this.positionY = random.nextInt(220);
         emuTime = 0;
 
     }
@@ -67,8 +67,8 @@ public class AiEmu {
     public void respawn(){
 
         Random random = new Random();
-        this.positionX = random.nextInt(400);
-        this.positionY = random.nextInt(200);
+        this.positionX = random.nextInt(430);
+        this.positionY = random.nextInt(220);
         this.state = "alive";
     }
     public void killed(){
@@ -77,6 +77,7 @@ public class AiEmu {
     public void despawn(){
         this.state = "despawned";
     }
+    public void gone() { this.state = "gone";}
     public float getX(){
         return this.positionX;
     }
@@ -96,4 +97,6 @@ public class AiEmu {
         this.positionY = y;
     }
 
+    public void dispose() {
+    }
 }
