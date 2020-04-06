@@ -9,36 +9,31 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import com.mygdx.game.Level;
 import com.mygdx.game.MyGdxGame;
-import com.mygdx.game.entities.AiEmu;
+import com.mygdx.game.World;
 import com.mygdx.game.entities.LevelStatus;
-import com.mygdx.game.entities.World1_Level1;
-import com.mygdx.game.entities.World1_Level2;
-import com.mygdx.game.entities.World1_Level3;
-import com.mygdx.game.entities.World1_Level4;
-import com.mygdx.game.entities.World1_Level5;
-import com.mygdx.game.entities.World1_Level6;
-import com.mygdx.game.entities.World1_Level7;
-import com.mygdx.game.entities.World1_Level8;
-import com.mygdx.game.entities.World1_Status;
+import com.mygdx.game.entities.World1_Levels.World1_Level1;
+import com.mygdx.game.entities.World1_Levels.World1_Level2;
+import com.mygdx.game.entities.World1_Levels.World1_Level3;
+import com.mygdx.game.entities.World1_Levels.World1_Level4;
+import com.mygdx.game.entities.World1_Levels.World1_Level5;
+import com.mygdx.game.entities.World1_Levels.World1_Level6;
+import com.mygdx.game.entities.World1_Levels.World1_Level7;
+import com.mygdx.game.entities.MapLevelStatus;
 
 
 import java.util.HashMap;
 
-import static com.badlogic.gdx.Gdx.files;
-//blah blah blah
 
 public class MapOverviewScreen implements Screen{
 
     Music mainSong = Gdx.audio.newMusic(Gdx.files.internal("You Reposted in the Wrong Dimmadome.mp3"));
-    public static final float SPEED = 300; // in pixels per second
+    public static final float SPEED = 200; // in pixels per second
     public static final float EMUSPEED = 40; // in pixels per second
 
 
@@ -54,20 +49,27 @@ public class MapOverviewScreen implements Screen{
     float elapsedTime = 0;
     boolean jimmyMovingX = false;
     boolean jimmyMovingY = false;
+    String jimmyName;
+    String background;
 
-    Sprite backgroundSprite = new Sprite();
+    Sprite backgroundSprite;
 
     //MyGdxGame constructor
     MyGdxGame game;
+    World world;
 
-    public MapOverviewScreen(MyGdxGame game){
+    public MapOverviewScreen(MyGdxGame game, World world){
         this.game = game;
+        this.world = world;
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(540, 360, camera);
-        jimmyTextureAtlas = new TextureAtlas("mapjimmy.txt");
-        textureAtlas = new TextureAtlas("mapoverview.txt");
 
-        jimmyAnimation = new Animation<TextureRegion>(0.1f, jimmyTextureAtlas.getRegions());
+        jimmyTextureAtlas = world.walkingTextureAtlas();
+        jimmyAnimation = world.walkingAnimation();
+        jimmyName = world.getJimmyName();
+
+        textureAtlas = world.mainTextureAtlas();
+        background = world.getBackground();
         addSprites();
 
 
@@ -100,7 +102,7 @@ public class MapOverviewScreen implements Screen{
 
 
     public void renderBackground() {
-        backgroundSprite = sprites.get("linkbackground");
+        backgroundSprite = sprites.get(background);
         backgroundSprite.setSize(540,360);
         backgroundSprite.draw(game.batch);
     }
@@ -123,156 +125,139 @@ public class MapOverviewScreen implements Screen{
 
         renderBackground();
 
-        if(LevelStatus.getStatus() == World1_Status.level1 || LevelStatus.getStatus() == World1_Status.level2 || LevelStatus.getStatus() == World1_Status.level3 || LevelStatus.getStatus() == World1_Status.level4 ||
-        LevelStatus.getStatus() == World1_Status.level5 || LevelStatus.getStatus() == World1_Status.level6 || LevelStatus.getStatus() == World1_Status.level7
-        || LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9)
-            if (jimmyX + 64 < 100 + sprites.get("active world token").getWidth()*2  && jimmyX + 64 > 116 && jimmyY + 64 < sprites.get("active world token").getWidth()*2 + 30 && jimmyY + 64 > 40){//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 100, 20);
+        if(LevelStatus.getStatus() == MapLevelStatus.level1 || LevelStatus.getStatus() == MapLevelStatus.level2 || LevelStatus.getStatus() == MapLevelStatus.level3 || LevelStatus.getStatus() == MapLevelStatus.level4 ||
+        LevelStatus.getStatus() == MapLevelStatus.level5 || LevelStatus.getStatus() == MapLevelStatus.level6 || LevelStatus.getStatus() == MapLevelStatus.level7
+        || LevelStatus.getStatus() == MapLevelStatus.level8 || LevelStatus.getStatus() == MapLevelStatus.level9)
+            if (jimmyX + 64 < world.LevelToken_x1() + sprites.get("active world token").getWidth()*2  && jimmyX + 64 > world.LevelToken_x1()+16 && jimmyY + 64 < sprites.get("active world token").getWidth()*2 + world.LevelToken_y1()+10 && jimmyY + 64 > world.LevelToken_y1()+20){//+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x1(), world.LevelToken_y1());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level1())));
+                    game.setScreen((new MainGameScreen(game, world.level1())));
                     this.dispose();
                 }
             }
             else{
-                drawSprite("world token",100,20);}
+                drawSprite("world token",world.LevelToken_x1(),world.LevelToken_y1());
+            }
 
-        if(LevelStatus.getStatus() == World1_Status.level2 || LevelStatus.getStatus() == World1_Status.level3 || LevelStatus.getStatus() == World1_Status.level4 ||
-                LevelStatus.getStatus() == World1_Status.level5 || LevelStatus.getStatus() == World1_Status.level6 || LevelStatus.getStatus() == World1_Status.level7
-                || LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 280 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 296 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 110 && jimmyY + 64 > 120) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 280, 100);
+        if(LevelStatus.getStatus() == MapLevelStatus.level2 || LevelStatus.getStatus() == MapLevelStatus.level3 || LevelStatus.getStatus() == MapLevelStatus.level4 ||
+                LevelStatus.getStatus() == MapLevelStatus.level5 || LevelStatus.getStatus() == MapLevelStatus.level6 || LevelStatus.getStatus() == MapLevelStatus.level7
+                || LevelStatus.getStatus() == MapLevelStatus.level8 || LevelStatus.getStatus() == MapLevelStatus.level9) {
+            if (jimmyX + 64 < world.LevelToken_x2() + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > world.LevelToken_x2()+16 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + world.LevelToken_y2()+10 && jimmyY + 64 > world.LevelToken_y2()+20) { //+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x2(), world.LevelToken_y2());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level2())));
+                    game.setScreen((new MainGameScreen(game, world.level2())));
                     this.dispose();
                 }
             } else {
-                drawSprite("world token", 280, 100);
+                drawSprite("world token", world.LevelToken_x2(), world.LevelToken_y2());
             }
         }
         else{
-            drawSprite("inactive world token", 280, 100);
+            drawSprite("inactive world token", world.LevelToken_x2(), world.LevelToken_y2());
         }
 
 
-        if(LevelStatus.getStatus() == World1_Status.level3 || LevelStatus.getStatus() == World1_Status.level4 || LevelStatus.getStatus() == World1_Status.level5
-                || LevelStatus.getStatus() == World1_Status.level6 || LevelStatus.getStatus() == World1_Status.level7
-                || LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 390 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 406 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 55 && jimmyY + 64 > 65) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 390, 45);
+        if(LevelStatus.getStatus() == MapLevelStatus.level3 || LevelStatus.getStatus() == MapLevelStatus.level4 || LevelStatus.getStatus() == MapLevelStatus.level5
+                || LevelStatus.getStatus() == MapLevelStatus.level6 || LevelStatus.getStatus() == MapLevelStatus.level7
+                || LevelStatus.getStatus() == MapLevelStatus.level8 || LevelStatus.getStatus() == MapLevelStatus.level9) {
+            if (jimmyX + 64 < world.LevelToken_x3() + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > world.LevelToken_x3()+16 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + world.LevelToken_y3()+10 && jimmyY + 64 > world.LevelToken_y3()+20) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x3(), world.LevelToken_y3());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level3())));
+                    game.setScreen((new MainGameScreen(game, world.level3())));
                     this.dispose();
                 }
             } else {
-                drawSprite("world token",390,45);
+                drawSprite("world token",world.LevelToken_x3(),world.LevelToken_y3());
             }
         }
         else{
-            drawSprite("inactive world token", 390, 45);
+            drawSprite("inactive world token", world.LevelToken_x3(), world.LevelToken_y3());
         }
 
-        if(LevelStatus.getStatus() == World1_Status.level4 || LevelStatus.getStatus() == World1_Status.level5 || LevelStatus.getStatus() == World1_Status.level6
-                || LevelStatus.getStatus() == World1_Status.level7 || LevelStatus.getStatus() == World1_Status.level8
-                || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 95 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 111 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 160 && jimmyY + 64 > 170) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 95, 150);
+        if(LevelStatus.getStatus() == MapLevelStatus.level4 || LevelStatus.getStatus() == MapLevelStatus.level5 || LevelStatus.getStatus() == MapLevelStatus.level6
+                || LevelStatus.getStatus() == MapLevelStatus.level7 || LevelStatus.getStatus() == MapLevelStatus.level8
+                || LevelStatus.getStatus() == MapLevelStatus.level9) {
+            if (jimmyX + 64 < world.LevelToken_x4() + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > world.LevelToken_x4()+16 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + world.LevelToken_y4()+10 && jimmyY + 64 > world.LevelToken_y4()+20) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x4(), world.LevelToken_y4());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level4())));
+                    game.setScreen((new MainGameScreen(game, world.level4())));
                     this.dispose();
                 }
             } else {
-                drawSprite("world token",95,150);
+                drawSprite("world token",world.LevelToken_x4(),world.LevelToken_y4());
             }
         }
         else{
-            drawSprite("inactive world token", 95, 150);
+            drawSprite("inactive world token", world.LevelToken_x4(), world.LevelToken_y4());
         }
 
-        if(LevelStatus.getStatus() == World1_Status.level5 || LevelStatus.getStatus() == World1_Status.level6 || LevelStatus.getStatus() == World1_Status.level7
-                || LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 255 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 271 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 175 && jimmyY + 64 > 185) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 255, 165);
+        if(LevelStatus.getStatus() == MapLevelStatus.level5 || LevelStatus.getStatus() == MapLevelStatus.level6 || LevelStatus.getStatus() == MapLevelStatus.level7
+                || LevelStatus.getStatus() == MapLevelStatus.level8 || LevelStatus.getStatus() == MapLevelStatus.level9) {
+            if (jimmyX + 64 < world.LevelToken_x5() + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > world.LevelToken_x5()+16 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + world.LevelToken_y5()+10 && jimmyY + 64 > world.LevelToken_y5()+20) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x5(), world.LevelToken_y5());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level5())));
+                    game.setScreen((new MainGameScreen(game, world.level5())));
                     this.dispose();
                 }
             } else {
-                drawSprite("world token",255,165);
+                drawSprite("world token",world.LevelToken_x5(),world.LevelToken_y5());
             }
         }
         else{
-            drawSprite("inactive world token", 255, 165);
+            drawSprite("inactive world token", world.LevelToken_x5(), world.LevelToken_y5());
         }
 
-        if(LevelStatus.getStatus() == World1_Status.level6 || LevelStatus.getStatus() == World1_Status.level7
-                || LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 420 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 436 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 180 && jimmyY + 64 > 190) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 420, 170);
+        if(LevelStatus.getStatus() == MapLevelStatus.level6 || LevelStatus.getStatus() == MapLevelStatus.level7
+                || LevelStatus.getStatus() == MapLevelStatus.level8 || LevelStatus.getStatus() == MapLevelStatus.level9) {
+            if (jimmyX + 64 < world.LevelToken_x6() + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > world.LevelToken_x6()+16 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + world.LevelToken_y6()+10 && jimmyY + 64 > world.LevelToken_y6()+20) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x6(), world.LevelToken_y6());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level6())));
+                    game.setScreen((new MainGameScreen(game, world.level6())));
                     this.dispose();
                 }
             } else {
-                drawSprite("world token",420,170);
+                drawSprite("world token",world.LevelToken_x6(),world.LevelToken_y6());
             }
         }
         else{
-            drawSprite("inactive world token", 420, 170);
+            drawSprite("inactive world token", world.LevelToken_x6(), world.LevelToken_y6());
         }
 
-        if(LevelStatus.getStatus() == World1_Status.level7 || LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 70 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 86 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 310 && jimmyY + 64 > 320) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 70, 300);
+        if(LevelStatus.getStatus() == MapLevelStatus.level7 || LevelStatus.getStatus() == MapLevelStatus.level8 || LevelStatus.getStatus() == MapLevelStatus.level9) {
+            if (jimmyX + 64 < world.LevelToken_x7() + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > world.LevelToken_x7() && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + world.LevelToken_y7()+10 && jimmyY + 64 > world.LevelToken_y7()+20) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
+                drawSprite("active world token", world.LevelToken_x7(), world.LevelToken_y7());
                 if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                     mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level7())));
+                    game.setScreen((new MainGameScreen(game, world.level7())));
                     this.dispose();
                 }
             } else {
-                drawSprite("world token",70,300);
+                drawSprite("world token",world.LevelToken_x7(),world.LevelToken_y7());
             }
         }
         else{
-            drawSprite("inactive world token", 70, 300);
+            drawSprite("inactive world token", world.LevelToken_x7(), world.LevelToken_y7());
         }
 
-        if(LevelStatus.getStatus() == World1_Status.level8 || LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 250 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 266 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 330 && jimmyY + 64 > 340) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 250, 320);
-                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    mainSong.stop();
-                    game.setScreen((new MainGameScreen(game, new World1_Level8())));
-                    this.dispose();
-                }
-            } else {
-                drawSprite("world token",250,320);
+        if(LevelStatus.getStatus() == MapLevelStatus.level8) {
+            mainSong.stop();
+            //game.setScreen((new World1_BossFightScreen(game)));}
+            if(world.getname() == "World1"){
+                game.setScreen(new World1_BossFightScreen(game));
+                this.dispose();
             }
-        }
-        else{
-            drawSprite("inactive world token", 250, 320);
+            else if(world.getname() == "World2"){
+                game.setScreen(new World2_BossFightScreen(game));
+                this.dispose();
+            }
         }
 
-        if(LevelStatus.getStatus() == World1_Status.level9) {
-            if (jimmyX + 64 < 465 + sprites.get("active world token").getWidth() * 2 && jimmyX + 64 > 481 && jimmyY + 64 < sprites.get("active world token").getWidth() * 2 + 330 && jimmyY + 64 > 340) {//&& jimmyY + 64 > 20 + sprites.get("active world token").getHeight()*2 ) { //+64 because that's the middle of Jimmy
-                drawSprite("active world token", 465, 320);
-                if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                    mainSong.stop();
-                    game.setScreen(new World1_BossFightScreen(game));
-                    this.dispose();
-                }
-            } else {
-                drawSprite("world token",465,320);
-            }
-        }
-        else{
-            drawSprite("inactive world token", 465, 320);
-        }
 
         TextureRegion currentFrame = jimmyAnimation.getKeyFrame(elapsedTime, true);
 
@@ -317,7 +302,7 @@ public class MapOverviewScreen implements Screen{
         elapsedTime += Gdx.graphics.getDeltaTime();
 
         if (animated == false)
-            drawSprite("Jimmy 1", jimmyX, jimmyY);
+            drawSprite(jimmyName, jimmyX, jimmyY);
 
         game.batch.end();
 

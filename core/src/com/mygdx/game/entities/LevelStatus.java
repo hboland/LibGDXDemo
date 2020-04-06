@@ -2,13 +2,13 @@ package com.mygdx.game.entities;
 
 public class LevelStatus {
 
-    static World1_Status status;
+    static MapLevelStatus status;
 
-    static public void setStatus(World1_Status level) {
+    static public void setStatus(MapLevelStatus level) {
         status = level;
     }
 
-    static public World1_Status getStatus(){
+    static public MapLevelStatus getStatus(){
         return status;
     }
 

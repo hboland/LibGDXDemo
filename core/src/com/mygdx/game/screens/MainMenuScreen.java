@@ -12,9 +12,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mygdx.game.MyGdxGame;
-import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.entities.LevelStatus;
-import com.mygdx.game.entities.World1_Status;
+import com.mygdx.game.entities.MapLevelStatus;
+import com.mygdx.game.entities.World1;
+import com.mygdx.game.entities.World2;
 
 
 import java.util.HashMap;
@@ -90,7 +91,7 @@ public class MainMenuScreen implements Screen {
 
         mainSong.play();
 
-        drawSprite("Title",250,450);
+        drawSprite("New Piskel-1.png",350,400);
 
         TextureRegion currentFrame = jimmyAnimation.getKeyFrame(elapsedTime, true);
 
@@ -102,9 +103,10 @@ public class MainMenuScreen implements Screen {
         drawSprite("active start",250,275);
         if (Gdx.input.isTouched()){
             mainSong.stop();
-            LevelStatus.setStatus(World1_Status.level1);
-            //game.setScreen(new MapOverviewScreen(game));
-            game.setScreen(new World1_BossFightScreen(game));
+            LevelStatus.setStatus(MapLevelStatus.level1);
+            game.setScreen(new MapOverviewScreen(game, new World2()));
+            //game.setScreen(new World1_BossFightScreen(game));
+            //game.setScreen(new Intro(game));
             this.dispose();
             }
         }
@@ -117,7 +119,7 @@ public class MainMenuScreen implements Screen {
             drawSprite("active emupedia",250,200);
             if (Gdx.input.isTouched()){
                 mainSong.stop();
-                game.setScreen(new EmupediaScreen(game));
+                game.setScreen(new EmupediaScreen(game, 0, true, MapLevelStatus.level1));
                 this.dispose();
             }
         }
@@ -125,29 +127,17 @@ public class MainMenuScreen implements Screen {
             drawSprite("emupedia",250,200);
         }
 
-//settings
-        if (Gdx.input.getX() < 250 + (sprites.get("active settings").getWidth()-26)*2 && Gdx.input.getX() > 300 && game.HEIGHT - Gdx.input.getY() < 140 + sprites.get("active settings").getHeight() && game.HEIGHT - Gdx.input.getY() > sprites.get("active settings").getHeight() + 70) {
-            drawSprite("active settings",250,125);
+//wxit
+        if (Gdx.input.getX() < 250 + (sprites.get("active exit").getWidth()-26)*2 && Gdx.input.getX() > 300 && game.HEIGHT - Gdx.input.getY() < 140 + sprites.get("active exit").getHeight() && game.HEIGHT - Gdx.input.getY() > sprites.get("active exit").getHeight() + 70) {
+            drawSprite("active exit",250,125);
             if (Gdx.input.isTouched()){
                 mainSong.stop();
-                game.setScreen(new SettingsScreen(game));
-                this.dispose();
+                Gdx.app.exit() ;
+            this.dispose();
             }
         }
         else {
-            drawSprite("settings",250,125);
-        }
-
-//exit
-        if (Gdx.input.getX() < 250 + (sprites.get("active exit").getWidth()-26)*2  && Gdx.input.getX() > 300 && game.HEIGHT - Gdx.input.getY() < 50 + sprites.get("active exit").getHeight() && game.HEIGHT - Gdx.input.getY() > sprites.get("active exit").getHeight()/2+40) {
-            drawSprite("active exit",250,50);
-            if (Gdx.input.isTouched()){
-                mainSong.stop();
-                Gdx.app.exit(); //this is for an exit or a quit game button
-            }
-        }
-        else {
-            drawSprite("exit",250,50);
+            drawSprite("exit",250,125);
         }
 
         elapsedTime += Gdx.graphics.getDeltaTime();

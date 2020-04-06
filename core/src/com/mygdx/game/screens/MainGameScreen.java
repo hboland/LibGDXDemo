@@ -4,14 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.BitmapFontCache;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -19,25 +18,26 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 import com.mygdx.game.Level;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.World;
 import com.mygdx.game.entities.AiEmu;
 
 
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.entities.LevelStatus;
-import com.mygdx.game.entities.World1_Status;
+import com.mygdx.game.entities.MapLevelStatus;
+import com.mygdx.game.entities.World1;
 
 import java.util.HashMap;
 import java.util.Random;
-
-
-import static com.badlogic.gdx.Gdx.files;
 //blah blah blah
 
 public class MainGameScreen implements Screen{
 
     Music mainSong;
-    public static final float SPEED = 250; // in pixels per second
-    public static final float EMUSPEED = 40; // in pixels per second
+    Music evolveSound = Gdx.audio.newMusic(Gdx.files.internal("evolve.mp3"));
+
+    public static float SPEED = 250; // in pixels per second
+    public static float EMUSPEED = 40; // in pixels per second
 
     BitmapFont font = new BitmapFont();//(Gdx.files.internal("Calibri.fnt"),Gdx.files.internal("Calibri.png"),false);
     OrthographicCamera camera;
@@ -45,30 +45,30 @@ public class MainGameScreen implements Screen{
     TextureAtlas textureAtlas;
     TextureAtlas jimmyTextureAtlas;
     TextureAtlas aiEmuTextureAtlas;
-    TextureAtlas jimmyAttackTextureAtlas;
-    TextureAtlas jimmyAbsorbTextureAtlas;
     TextureAtlas mainGameTextureAtlas;
 
-    Animation<TextureRegion> jimmyAbsorbAnimation;
-    Animation<TextureRegion> jimmyAttackAnimation;
     Animation<TextureRegion> jimmyAnimation;
     Animation<TextureRegion> aiEmuAnimation;
     final HashMap<String, Sprite> sprites = new HashMap<String, Sprite>();
     float jimmyX = 100;
     float jimmyY = 100;
-    float elapsedTime = 0;
+    float elapsedTime = 0;float
+    animatedTime = 0;
+    boolean attacking = false;
+    boolean absorbing = false;
     int currentDeathToll = 0;
+    private int respawned = 0;
     boolean jimmyMovingX = false;
     boolean jimmyMovingY = false;
+    boolean isOverlapping = false;
     private Rectangle jimmyRectangle;
     private Sprite jimmySprite;
     String jimmyName;
     String background;
-    private int respawned = 0;
 
     Random rand = new Random();
     Sprite backgroundSprite;
-    World1_Status levelStatus;
+    MapLevelStatus levelStatus;
 
    //AiEmu AiEmus[6];
 
@@ -98,10 +98,12 @@ public class MainGameScreen implements Screen{
     Level level;
 
 
-    private static final int FRAME_COLS = 4, FRAME_ROWS = 5;
+    private static int FRAME_COLS;
+    private static int FRAME_ROWS;
+
     Animation<TextureRegion> evolveAnimation;
     Texture evolveSheet;
-    float stateTime;
+    float evolveTime = 0f;
 
 
 
@@ -120,36 +122,46 @@ public class MainGameScreen implements Screen{
         aiEmuTextureAtlas = new TextureAtlas("Normal Jimmy.txt");
         mainGameTextureAtlas = new TextureAtlas("maingame.txt");
         textureAtlas = level.mainTextureAtlas();
-        jimmyAttackTextureAtlas = level.attackTextureAtlas();
-        jimmyAbsorbTextureAtlas = level.absorbTextureAtlas();
+        evolveSheet = level.evolveTexture();
+        //TextureRegion[][] tmp = TextureRegion.split(evolveSheet, evolveSheet.getWidth() / FRAME_COLS, evolveSheet.getHeight() / FRAME_ROWS);
+
+        if(levelStatus == MapLevelStatus.level8) {
+            FRAME_COLS = 5;
+            FRAME_ROWS = 6;
+            TextureRegion[][] tmp = TextureRegion.split(evolveSheet, evolveSheet.getWidth() / FRAME_COLS, evolveSheet.getHeight() / FRAME_ROWS);
+
+            TextureRegion[] evolveFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+            int index = 0;
+            for (int i = 0; i < FRAME_ROWS; i++) {
+                for (int j = 0; j < FRAME_COLS; j++) {
+                    evolveFrames[index++] = tmp[i][j];
+                }
+            }
+            evolveAnimation = new Animation<>(1.4f, evolveFrames);
+
+        }
+        else {
+            FRAME_COLS = 4;
+            FRAME_ROWS = 5;
+            TextureRegion[][] tmp = TextureRegion.split(evolveSheet, evolveSheet.getWidth() / FRAME_COLS, evolveSheet.getHeight() / FRAME_ROWS);
+
+            TextureRegion[] evolveFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+            int index = 0;
+            for (int i = 0; i < FRAME_ROWS; i++) {
+                for (int j = 0; j < FRAME_COLS; j++) {
+                    evolveFrames[index++] = tmp[i][j];
+                }
+            }
+            evolveAnimation = new Animation<>(1.2f, evolveFrames);
+
+        }
 
         jimmyName = level.getJimmyName();
         background = level.getBackground();
 
         jimmyAnimation = level.walkingAnimation();
-        aiEmuAnimation = new Animation<TextureRegion>(0.f, aiEmuTextureAtlas.getRegions());
-        jimmyAttackAnimation = level.attackAnimation();
-        jimmyAbsorbAnimation = level.absorbAnimation();
-        //addSprites();
-
-
-        evolveSheet = new Texture(Gdx.files.internal("jimmy hits the slopes evolution.png"));
-
-
-        TextureRegion[][] tmp = TextureRegion.split(evolveSheet,
-                evolveSheet.getWidth() / FRAME_COLS,
-                evolveSheet.getHeight() / FRAME_ROWS);
-
-        TextureRegion[] evolveFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-        int index = 0;
-        for (int i = 0; i < FRAME_ROWS; i++) {
-            for (int j = 0; j < FRAME_COLS; j++) {
-                evolveFrames[index++] = tmp[i][j];
-            }
-        }
-
-        evolveAnimation = new Animation<TextureRegion>(1.5f, evolveFrames);
-        stateTime = 0f;
+        aiEmuAnimation = new Animation<TextureRegion>(0.1f, aiEmuTextureAtlas.getRegions());
+        //evolveAnimation = new Animation<>(1.2f, evolveFrames);
 
         addSprites();
 
@@ -206,12 +218,8 @@ public class MainGameScreen implements Screen{
 
         boolean animated = false;
         boolean aiAnimated;
-        boolean isOverlapping;
         jimmyMovingX = false;
         jimmyMovingY = false;
-
-
-        // jimmySprite = new Sprite(new Texture(files.internal("Normal Jimmy.png")));
 
         game.batch.begin();
 
@@ -222,7 +230,7 @@ public class MainGameScreen implements Screen{
             drawSprite("active back arrow", 10, 315);
             if (Gdx.input.isTouched()) {
                 mainSong.stop();
-                game.setScreen(new MapOverviewScreen(game));
+                game.setScreen(new EmupediaScreen(game, currentDeathToll, false, levelStatus));
             }
         }
         else{
@@ -233,12 +241,7 @@ public class MainGameScreen implements Screen{
         TextureRegion currentFrame = jimmyAnimation.getKeyFrame(elapsedTime, true);
         jimmySprite = new Sprite(currentFrame);
         TextureRegion aiEmuFrame = aiEmuAnimation.getKeyFrame(elapsedTime, true);
-        TextureRegion jimmyattack = jimmyAttackAnimation.getKeyFrame(elapsedTime, true);
-        TextureRegion jimmyabsorb = jimmyAbsorbAnimation.getKeyFrame(elapsedTime, true);
-
-
-
-        TextureRegion evolveFrame = evolveAnimation.getKeyFrame(stateTime, false);
+        TextureRegion evolveFrame = evolveAnimation.getKeyFrame(evolveTime, false);
 
 
 
@@ -250,38 +253,48 @@ public class MainGameScreen implements Screen{
             aiAnimated = false;
 
             if (aiEmus[i].getState() == "despawned") {
-                if (currentDeathToll == level.deathToll()){
+
+                //when death toll is hit, play evolution animation and return to map
+                if (currentDeathToll == level.deathToll()) {
                     LevelStatus.setStatus(levelStatus);
                     mainSong.stop();
-                    //stateTime = 0f;
-                    game.setScreen(new MapOverviewScreen(game));
+                    //game.setScreen(new EvolutionScreen(game, level));
+                    if (LevelStatus.getStatus() == MapLevelStatus.level8) {
+                        resize(1080, 720);
 
-
-                    /* time = elapsedTime;
-                    resize(4000, 2000);
-                    Gdx.gl.glClearColor(0, 0, 0, 1);
-                    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                    game.batch.draw(evolveFrame, 30, 0);
-                    stateTime += Gdx.graphics.getDeltaTime();
-                    if(time+5 >= elapsedTime){
-                        game.setScreen(new MapOverviewScreen(game));
-
-                    }*/
+                        Gdx.gl.glClearColor(0, 0, 0, 1);
+                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                        game.batch.draw(evolveFrame, 10, 10);
+                        evolveTime += Gdx.graphics.getDeltaTime();
+                        if (evolveTime >= 40) {
+                            game.setScreen(new MapOverviewScreen(game, level.worldname()));
+                            this.dispose();
+                        }
+                    } else {
+                        resize(4000, 2000);
+                        Gdx.gl.glClearColor(0, 0, 0, 1);
+                        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                        game.batch.draw(evolveFrame, 30, 0);
+                        evolveSound.play();
+                        evolveTime += Gdx.graphics.getDeltaTime();
+                        if (evolveTime >= 24) {
+                            evolveSound.stop();
+                            game.setScreen(new MapOverviewScreen(game, level.worldname()));
+                            this.dispose();
+                        }
+                    }
                 }
 
+                //respawn enough emus to complete levels
                 if (respawned < level.deathToll() - aiEmus.length) {
 
+                    //create delay so emus don't respawn instantly
                     if (aiEmus[i].timeSinceDespawn == aiEmus[i].timeUntilRespawn) {                                      // use this for time of respawn in the future(aiEmus[i].timeUntilRespawn >= 0) {
                         aiEmus[i].respawn();
                         respawned++;
                     }
                     else{
-                    /*else if(aiEmus[i].timeSinceDespawn == 0 && currentDeathToll < level.deathToll() - aiEmus.length)
-                    {
-                        currentDeathToll++;
-                        font.draw(game.batch, currentDeathToll + "/" + level.deathToll(), 470, 330);
-                    }*/
-                    aiEmus[i].timeSinceDespawn++;}
+                        aiEmus[i].timeSinceDespawn++;}
                 }
             }
 
@@ -368,8 +381,8 @@ public class MainGameScreen implements Screen{
         }
 
 //checking for key press
-
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (!attacking & !absorbing) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 
                 if (jimmyX > -40) {
                     jimmyX += -SPEED * Gdx.graphics.getDeltaTime();
@@ -377,87 +390,128 @@ public class MainGameScreen implements Screen{
                     animated = true;
                     jimmyMovingX = true;
 
-                    jimmyRectangle = new Rectangle(jimmyX+32, jimmyY+64, (int) jimmySprite.getWidth()-96, (int) jimmySprite.getHeight()-64);
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) jimmySprite.getWidth() - 96, (int) jimmySprite.getHeight() - 64);
+
+                }
+            } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+
+                if (jimmyX < 435 && jimmyMovingX == false) {
+                    jimmyX += SPEED * Gdx.graphics.getDeltaTime();
+                    drawAnimation(currentFrame, jimmyX, jimmyY);
+                    animated = true;
+
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) jimmySprite.getWidth() - 96, (int) jimmySprite.getHeight() - 64);
 
                 }
             }
-        else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                if (jimmyY > 0) {
+                    jimmyY += -SPEED * Gdx.graphics.getDeltaTime();
+                    drawAnimation(currentFrame, jimmyX, jimmyY);
+                    animated = true;
+                    jimmyMovingY = true;
 
-            if (jimmyX < 435 && jimmyMovingX == false) {
-                jimmyX += SPEED * Gdx.graphics.getDeltaTime();
-                drawAnimation(currentFrame, jimmyX, jimmyY);
-                animated = true;
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) jimmySprite.getWidth() - 96, (int) jimmySprite.getHeight() - 64);
 
-                jimmyRectangle = new Rectangle(jimmyX+32, jimmyY+64, (int) jimmySprite.getWidth()-96, (int) jimmySprite.getHeight()-64);
+                }
+            } else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                if (jimmyY < 220 && jimmyMovingY == false) {
+                    jimmyY += SPEED * Gdx.graphics.getDeltaTime();
+                    drawAnimation(currentFrame, jimmyX, jimmyY);
+                    animated = true;
 
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) jimmySprite.getWidth() - 96, (int) jimmySprite.getHeight() - 64);
+
+                }
             }
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            if (jimmyY > 0) {
-                jimmyY += -SPEED * Gdx.graphics.getDeltaTime();
-                drawAnimation(currentFrame, jimmyX, jimmyY);
-                animated = true;
-                jimmyMovingY = true;
-
-                jimmyRectangle = new Rectangle(jimmyX+32, jimmyY+64, (int) jimmySprite.getWidth()-96, (int) jimmySprite.getHeight()-64);
-
-            }
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.W )) {
-            if (jimmyY < 220 && jimmyMovingY == false) {
-                jimmyY += SPEED * Gdx.graphics.getDeltaTime();
-                drawAnimation(currentFrame, jimmyX, jimmyY);
-                animated = true;
-
-                jimmyRectangle = new Rectangle(jimmyX+32, jimmyY+64, (int) jimmySprite.getWidth()-96, (int) jimmySprite.getHeight()-64);
-
-            }
-        }
-
 
 
         elapsedTime += Gdx.graphics.getDeltaTime();
 
-
         if (animated == false) {
-            drawSprite(jimmyName, jimmyX, jimmyY);
+            if (elapsedTime - animatedTime > 0.3f){
+                drawSprite(jimmyName, jimmyX, jimmyY);
+                attacking = false;
+                absorbing = false;
+                jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) jimmySprite.getWidth() - 96, (int) jimmySprite.getHeight() - 64);
 
-            jimmyRectangle = new Rectangle(jimmyX+32, jimmyY+64, (int) jimmySprite.getWidth()-96, (int) jimmySprite.getHeight()-64);
 
-
-            for (int i = 0; i <7; i++) {
-                if (aiEmus[i].getState() == "alive") {
-                    isOverlapping = aiRectangle[i].overlaps(jimmyRectangle);
-                    if (isOverlapping) {
-                        if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-                            aiEmus[i].killed();
-                            //drawSprite("Radioactive Jimmy attack", jimmyX, jimmyY);
-                            drawAnimation(jimmyattack, jimmyX, jimmyY);
+                for (int i = 0; i < 7; i++) {
+                    if (aiEmus[i].getState() == "alive") {
+                        isOverlapping = aiRectangle[i].overlaps(jimmyRectangle);
+                        if (isOverlapping) {
+                            if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                                aiEmus[i].killed();
+                                animatedTime = elapsedTime;
+                                attacking = true;
+                            }
                         }
-                    }
-                }
-                else if (aiEmus[i].getState() == "dead") {
-                    isOverlapping = aiRectangle[i].overlaps(jimmyRectangle);
-                    if (isOverlapping) {
-                        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && aiEmus[i].getState() == "dead") {
-                            aiEmus[i].despawn();
-                            //if(currentDeathToll >= level.deathToll() - aiEmus.length) {
+                    } else if (aiEmus[i].getState() == "dead") {
+                        isOverlapping = aiRectangle[i].overlaps(jimmyRectangle);
+                        if (isOverlapping) {
+                            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && aiEmus[i].getState() == "dead") {
+                                aiEmus[i].despawn();
                                 currentDeathToll++;
                                 font.draw(game.batch, currentDeathToll + "/" + level.deathToll(), 470, 330);
-                            //}
-                            drawAnimation(jimmyabsorb, jimmyX, jimmyY);
+                                animatedTime = elapsedTime;
+                                absorbing = true;
+                            }
                         }
                     }
                 }
             }
+            else if (attacking == true)
+               // drawAnimation(jimmyattack, jimmyX, jimmyY);
+                drawSprite(level.getJimmyAttackName(), jimmyX, jimmyY);
+            else if (absorbing == true)
+                //drawAnimation(jimmyabsorb, jimmyX, jimmyY);
+                drawSprite(level.getJimmyAbsorbName(), jimmyX, jimmyY);
+
         }
 
-        font.draw(game.batch, currentDeathToll + "/" + level.deathToll(), 470, 330);
+        font.draw(game.batch, "Emus till next Evolution: "+currentDeathToll + "/" + level.deathToll(), 330, 330);
 
     game.batch.end();
 
     }
 
+
+    //if space bar is hit kill or absorb any emus Jimmy overlaps with
+   /* public void murderTime(){
+
+        boolean isOverlapping;
+        TextureRegion jimmyattack = jimmyAttackAnimation.getKeyFrame(elapsedTime, true);
+        TextureRegion jimmyabsorb = jimmyAbsorbAnimation.getKeyFrame(elapsedTime, true);
+
+        for (int i = 0; i <7; i++) {
+            if (aiEmus[i].getState() == "alive") {
+                isOverlapping = aiRectangle[i].overlaps(jimmyRectangle);
+                if (isOverlapping) {
+                    if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                        aiEmus[i].killed();
+                        drawAnimation(jimmyattack, jimmyX, jimmyY);
+
+                        emuTime += Gdx.graphics.getDeltaTime();
+                        if(emuTime >= 30){
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (aiEmus[i].getState() == "dead") {
+                isOverlapping = aiRectangle[i].overlaps(jimmyRectangle);
+                if (isOverlapping) {
+                    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && aiEmus[i].getState() == "dead") {
+                        aiEmus[i].despawn();
+                        currentDeathToll++;
+                        font.draw(game.batch, "Emus till next Evolution: "+currentDeathToll + "/" + level.deathToll(), 330, 330);
+                        drawAnimation(jimmyabsorb, jimmyX, jimmyY);
+                    }
+                }
+            }
+        }
+    }*/
 
     @Override
     public void resize(int width, int height){
