@@ -13,9 +13,12 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.mygdx.game.Level;
 import com.mygdx.game.MyGdxGame;
 import com.badlogic.gdx.graphics.Texture;
+import com.mygdx.game.World;
 import com.mygdx.game.entities.MapLevelStatus;
+import com.mygdx.game.entities.World1;
 import com.mygdx.game.entities.World1_Levels.World1_Level1;
 import com.mygdx.game.entities.World1_Levels.World1_Level2;
 import com.mygdx.game.entities.World1_Levels.World1_Level3;
@@ -23,6 +26,13 @@ import com.mygdx.game.entities.World1_Levels.World1_Level4;
 import com.mygdx.game.entities.World1_Levels.World1_Level5;
 import com.mygdx.game.entities.World1_Levels.World1_Level6;
 import com.mygdx.game.entities.World1_Levels.World1_Level7;
+import com.mygdx.game.entities.World2;
+import com.mygdx.game.entities.World2_Levels.World2_Level1;
+import com.mygdx.game.entities.World2_Levels.World2_Level2;
+import com.mygdx.game.entities.World2_Levels.World2_Level3;
+import com.mygdx.game.entities.World2_Levels.World2_Level4;
+import com.mygdx.game.entities.World2_Levels.World2_Level5;
+import com.mygdx.game.entities.World2_Levels.World2_Level7;
 //import com.mygdx.game.entities.World1_Levels.World1_Level8;
 
 
@@ -32,7 +42,7 @@ import java.util.List;
 
 public class EmupediaScreen implements Screen {
 
-    BitmapFont font = new BitmapFont();//(Gdx.files.internal("Calibri.fnt"),Gdx.files.internal("Calibri.png"),false);
+    BitmapFont font = new BitmapFont();
     OrthographicCamera camera;
     ExtendViewport viewport;
     TextureAtlas textureAtlas;
@@ -46,13 +56,15 @@ public class EmupediaScreen implements Screen {
     Sprite backgroundSprite = new Sprite();
 
     public int page = 0;
-    public int maxPages = 14;
+    public int maxPages = 15;
     String[] emuList;
     private int lastDeathToll;
     private boolean menu;
     private MapLevelStatus levelStatus;
 
     MyGdxGame game;
+    Level level;
+    World world;
     private String[] emuNames = {"Jimmy", "Mutant Jimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "Bat Jimmy", "GYMmy", "Sad Jimmy", "Pirate Jimmy", "Jimmy hits the Slopes", "Galactic Jimmy", "Jimmy Skywalker"};
     private String[] info = {"Just a regular Emu named Jimmy. He enjoys long walks on the beach and is an avid sky",
             "Jimmy has become the most powerful emu on the planet, but how far will his new powers", "", "", "", "", "", "",
@@ -64,9 +76,10 @@ public class EmupediaScreen implements Screen {
 
 
 
-    public EmupediaScreen(MyGdxGame game, int deathToll, boolean fromMenu, MapLevelStatus level)
+    public EmupediaScreen(MyGdxGame game, int deathToll, boolean fromMenu, Level level)
     {
         this.game = game;
+        this.level = level;
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(900, 560, camera);
         textureAtlas = new TextureAtlas("emupedia.txt");
@@ -91,8 +104,6 @@ public class EmupediaScreen implements Screen {
         sprites.get("pirateJimmy").setSize(250,250);
         sprites.get("jimmySlopes").setSize(250,250);
         sprites.get("spaceJimmy").setSize(250,250);
-
-
         sprites.get("hydraJimmy").setSize(250,250);
         sprites.get("realJimmy").setSize(250,250);
         sprites.get("sharkJimmy").setSize(250,250);
@@ -104,67 +115,60 @@ public class EmupediaScreen implements Screen {
         //String[] list = {"previousActive", "previousInactive", "previousActive", "previousInactive", "previousActive", "previousInactive", "previousActive", "previousInactive", "previousActive", "previousInactive"};
         lastDeathToll = deathToll;
         menu = fromMenu;
-        levelStatus = level;
+        levelStatus = level.completed();
 
-        if (levelStatus == MapLevelStatus.level1){
-            // all silhouettes
-            String[] list = {"jimmy", "mutatedJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
+        if(level.worldString() == "World2") {
+            if (levelStatus == MapLevelStatus.level2) {
+                String[] list = {"jimmy", "mutatedJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level3) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level4) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level5) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level7) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level8) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            }
+        }
+        else if (level.worldString() == "World1") {
+            if (levelStatus == MapLevelStatus.level1) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level2) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level3) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level4) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level5) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level6) {
+                String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "jimmySlopes", "silhouetteJimmy", "silhouetteJimmy"};
+                emuList = list;
+            } else if (levelStatus == MapLevelStatus.level7) {
+                    String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "jimmySlopes", "spaceJimmy", "silhouetteJimmy"};
+                    emuList = list;
+            } else if (levelStatus == MapLevelStatus.level8) {
+                    String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "jimmySlopes", "spaceJimmy", "jimmySkywalker"};
+                    emuList = list;
+            }
+        }
+        else{
+            String[] list = {"jimmy", "mutatedJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy"};
             emuList = list;
         }
-        else if (levelStatus == MapLevelStatus.level2){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy", "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level3){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level4){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level5){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level6){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "spaceJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level7){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "silhouetteJimmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level8) {
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level9){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-
-        //world 2 now
-        else if (levelStatus == MapLevelStatus.level9){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy" , "pirateJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level9){
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy" , "pirateJimmy" , "silhouetteJimmy" , "silhouetteJimmy" , "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level9) {
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "jimmySlopes", "silhouetteJimmy", "silhouetteJimmy"};
-            emuList = list;
-        }
-        else if (levelStatus == MapLevelStatus.level9) {
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "jimmySlopes", "spaceJimmy", "silhouetteJimmy"};
-            emuList = list;
-        }else if (levelStatus == MapLevelStatus.level9) {
-            String[] list = {"jimmy", "mutatedJimmy", "sharkJimmy", "hydraJimmy", "sherifJimmy", "realJimmy", "rogueJimmy", "snorkelJimmy", "batJimmy", "gymmy", "sadJimmy", "pirateJimmy", "jimmySlopes", "spaceJimmy", "jimmySkywalker"};
-            emuList = list;
-        }
-
         font.setColor(Color.BLACK);
         font.getData().setScale(1.5f);
     }
@@ -217,35 +221,38 @@ public class EmupediaScreen implements Screen {
                 if (menu) {
                     game.setScreen(new MainMenuScreen(game));
                 }
-                else{
+                else if(level.worldString() == "World2") {
                     //go back to the level we came from
-                    if (levelStatus == MapLevelStatus.level1){
+                    if (levelStatus == MapLevelStatus.level2) {
+                        game.setScreen((new MainGameScreen(game, new World2_Level1())));
+                    } else if (levelStatus == MapLevelStatus.level3) {
+                        game.setScreen((new MainGameScreen(game, new World2_Level2())));
+                    } else if (levelStatus == MapLevelStatus.level4) {
+                        game.setScreen((new MainGameScreen(game, new World2_Level3())));
+                    } else if (levelStatus == MapLevelStatus.level5) {
+                        game.setScreen((new MainGameScreen(game, new World2_Level4())));
+                    } else if (levelStatus == MapLevelStatus.level7) {
+                        game.setScreen((new MainGameScreen(game, new World2_Level5())));
+                    } else if (levelStatus == MapLevelStatus.level8) {
+                        game.setScreen((new MainGameScreen(game, new World2_Level7())));
+                    }
+                }
+                else if(level.worldString() == "World1") {
+                    if (levelStatus == MapLevelStatus.level2) {
                         game.setScreen((new MainGameScreen(game, new World1_Level1())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level2){
+                    } else if (levelStatus == MapLevelStatus.level3) {
                         game.setScreen((new MainGameScreen(game, new World1_Level2())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level3){
+                    } else if (levelStatus == MapLevelStatus.level4) {
                         game.setScreen((new MainGameScreen(game, new World1_Level3())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level4){
+                    } else if (levelStatus == MapLevelStatus.level5) {
                         game.setScreen((new MainGameScreen(game, new World1_Level4())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level5){
+                    } else if (levelStatus == MapLevelStatus.level6) {
                         game.setScreen((new MainGameScreen(game, new World1_Level5())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level6){
+                    } else if (levelStatus == MapLevelStatus.level7) {
                         game.setScreen((new MainGameScreen(game, new World1_Level6())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level7){
+                    } else if (levelStatus == MapLevelStatus.level8) {
                         game.setScreen((new MainGameScreen(game, new World1_Level7())));
                     }
-                    /*else if (levelStatus == MapLevelStatus.level8){
-                        game.setScreen((new MainGameScreen(game, new World1_Level8())));
-                    }
-                    else if (levelStatus == MapLevelStatus.level9){
-                        game.setScreen((new MainGameScreen(game, new World1_Level8())));
-                    }*/
                 }
             }
         }
@@ -320,21 +327,6 @@ public class EmupediaScreen implements Screen {
         }
         TextureRegion currentFrame = jimmyAnimation.getKeyFrame(elapsedTime, true);
 
-
-
-
-//start
-        /*if (Gdx.input.getX() < 250 + (sprites.get("active settings").getWidth()-26)*2  && Gdx.input.getX() > 300 && game.HEIGHT - Gdx.input.getY() < 325 + sprites.get("active start").getHeight() && game.HEIGHT - Gdx.input.getY() > sprites.get("active start").getHeight()*3 ) {
-            // REMEMBER!!! GETY() STARTS AT 0 FROM THE TOP LEFT CORNER AND NOT THE BOTTOM RIGHT LIKE IT TOTALLY SHOULD!!!!! (SPENT HOURS ON THIS)
-            drawSprite("active start",250,275);
-            if (Gdx.input.isTouched()){
-                game.setScreen((new MapOverviewScreen(game)));
-                this.dispose();
-            }
-        }
-        else {
-            drawSprite("start",250,275);
-        }*/
 
 
         elapsedTime += Gdx.graphics.getDeltaTime();

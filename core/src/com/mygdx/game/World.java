@@ -23,7 +23,7 @@ public interface World {
 
     Animation<TextureRegion> walkingAnimation();
 
-    MapLevelStatus completed();
+    //MapLevelStatus completed();
 
     int LevelToken_x1();
     int LevelToken_y1();

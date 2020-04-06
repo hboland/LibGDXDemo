@@ -109,7 +109,7 @@ public class World2 implements World{
 
         walkingAnimation = new Animation<TextureRegion>(0.1f, walkingTextureAtlas().getRegions());
 
-        levelStatus = MapLevelStatus.level2;
+        //levelStatus = MapLevelStatus.level2;
 
     }
 
@@ -166,9 +166,9 @@ public class World2 implements World{
         return walkingAnimation;
     }
 
-    public MapLevelStatus completed(){
+    /*public MapLevelStatus completed(){
         return levelStatus;
-    }
+    }*/
 
     public int LevelToken_x1(){
         return level1_x;

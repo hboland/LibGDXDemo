@@ -92,4 +92,6 @@ public class World1_Level7 implements Level {
 
     public World worldname(){ return new World1();}
 
+    public String worldString(){ return "World1";}
+
 }

@@ -11,10 +11,13 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.mygdx.game.Level;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.World;
 import com.mygdx.game.entities.LevelStatus;
 import com.mygdx.game.entities.MapLevelStatus;
 import com.mygdx.game.entities.World2;
+import com.mygdx.game.entities.World2_Levels.World2_Level1;
 
 
 import java.util.HashMap;
@@ -34,11 +37,15 @@ public class MainMenuScreen implements Screen {
 
 
     MyGdxGame game;
+    Level level;
+    World world;
 
 
     public MainMenuScreen(MyGdxGame game)
     {
         this.game = game;
+        level = new World2_Level1();
+        world = new World2();
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(900, 560, camera);
         textureAtlas = new TextureAtlas("mainmenu.txt");
@@ -118,7 +125,7 @@ public class MainMenuScreen implements Screen {
             drawSprite("active emupedia",250,200);
             if (Gdx.input.isTouched()){
                 mainSong.stop();
-                game.setScreen(new EmupediaScreen(game, 0, true, MapLevelStatus.level1));
+                game.setScreen(new EmupediaScreen(game, 0, true, level));
                 this.dispose();
             }
         }

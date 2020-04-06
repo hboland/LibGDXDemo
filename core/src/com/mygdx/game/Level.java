@@ -27,6 +27,7 @@ public interface Level {
     MapLevelStatus completed();
 
     World worldname();
+    String worldString();
 
 
 

@@ -196,15 +196,15 @@ public class MainGameScreen implements Screen{
         renderBackground();
 
 
-        if (Gdx.input.getX() < 20 + (sprites.get("active back arrow").getWidth()*2)  && Gdx.input.getX() > 20 && game.HEIGHT - Gdx.input.getY() < 670 + sprites.get("active back arrow").getHeight() && game.HEIGHT - Gdx.input.getY() > 670 - sprites.get("active back arrow").getHeight()/2) {
-            drawSprite("active back arrow", 10, 315);
+        if (Gdx.input.getX() < 20 + (sprites.get("active back arrow").getWidth() * 2) && Gdx.input.getX() > 20 && Gdx.input.getY() < game.HEIGHT - 10 &&  Gdx.input.getY() > game.HEIGHT - sprites.get("active back arrow").getHeight()*2.5 ) {
+            drawSprite("active back arrow", 10, 10);
             if (Gdx.input.isTouched()) {
                 mainSong.stop();
-                game.setScreen(new EmupediaScreen(game, currentDeathToll, false, levelStatus));
+                game.setScreen(new EmupediaScreen(game, currentDeathToll, false, level)); 
             }
         }
-        else{
-            drawSprite("back arrow", 10, 315);
+        else {
+            drawSprite("back arrow", 10, 10);
         }
 
 

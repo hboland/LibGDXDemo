@@ -90,4 +90,6 @@ public class World2_Level2  implements Level {
 
     public World2 worldname(){ return new World2();}
 
+    public String worldString(){ return "World2";}
+
 }

@@ -19,11 +19,7 @@ public class World2_Level6 implements Level {
 
     TextureAtlas textureAtlas;
     TextureAtlas walkingTextureAtlas;
-    TextureAtlas attackTextureAtlas;
-    TextureAtlas absorbTextureAtlas;
 
-    Animation<TextureRegion> jimmyAbsorbAnimation;
-    Animation<TextureRegion> jimmyAttackAnimation;
     Animation<TextureRegion> walkingAnimation;
 
     String background;
@@ -38,8 +34,6 @@ public class World2_Level6 implements Level {
 
         walkingTextureAtlas = new TextureAtlas("radioactive jimmy walking.txt");
         textureAtlas = new TextureAtlas("World1_level1.txt");
-        attackTextureAtlas = new TextureAtlas("jimmy attack.txt");
-        absorbTextureAtlas = new TextureAtlas("radioactive jimmy absorb.txt");
 
         jimmyName = "Radioactive Jimmy";
         jimmyAttackName = "Radioactive Jimmy attack";
@@ -47,8 +41,6 @@ public class World2_Level6 implements Level {
         background = "town";
 
         walkingAnimation = new Animation<TextureRegion>(0.1f, walkingTextureAtlas.getRegions());
-        jimmyAttackAnimation = new Animation<TextureRegion>(1f, attackTextureAtlas.getRegions());
-        jimmyAbsorbAnimation = new Animation<TextureRegion>(1f, absorbTextureAtlas.getRegions());
         evolveSheet = new Texture(Gdx.files.internal("dragon evolution.png"));
 
         deathToll = 10;
@@ -70,14 +62,6 @@ public class World2_Level6 implements Level {
         return walkingTextureAtlas;
     }
 
-    public TextureAtlas attackTextureAtlas(){
-        return attackTextureAtlas;
-    }
-
-    public TextureAtlas absorbTextureAtlas(){
-        return absorbTextureAtlas;
-    }
-
     public Texture evolveTexture(){return evolveSheet;}
 
     public String getJimmyName(){
@@ -96,14 +80,6 @@ public class World2_Level6 implements Level {
         return walkingAnimation;
     }
 
-    public Animation<TextureRegion> attackAnimation(){
-        return jimmyAttackAnimation;
-    }
-
-    public Animation<TextureRegion> absorbAnimation(){
-        return jimmyAbsorbAnimation;
-    }
-
     public int deathToll(){
         return deathToll;
     }
@@ -113,5 +89,8 @@ public class World2_Level6 implements Level {
     }
 
     public World2 worldname(){ return new World2();}
+
+    public String worldString(){ return "World2";}
+
 
 }
