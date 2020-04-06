@@ -34,7 +34,6 @@ public class MapOverviewScreen implements Screen{
 
     Music mainSong = Gdx.audio.newMusic(Gdx.files.internal("You Reposted in the Wrong Dimmadome.mp3"));
     public static final float SPEED = 200; // in pixels per second
-    public static final float EMUSPEED = 40; // in pixels per second
 
 
     OrthographicCamera camera;
@@ -247,7 +246,6 @@ public class MapOverviewScreen implements Screen{
 
         if(LevelStatus.getStatus() == MapLevelStatus.level8) {
             mainSong.stop();
-            //game.setScreen((new World1_BossFightScreen(game)));}
             if(world.getname() == "World1"){
                 game.setScreen(new World1_BossFightScreen(game));
                 this.dispose();
@@ -270,8 +268,7 @@ public class MapOverviewScreen implements Screen{
                 jimmyX += -SPEED * Gdx.graphics.getDeltaTime();
                 drawAnimation(currentFrame, jimmyX, jimmyY);
                 animated = true;
-                //jimmyMovingX = true;
-                //Gdx.input.
+
             }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {

@@ -45,7 +45,7 @@ public class World2_Level1 implements Level{
 
         deathToll = 10;
 
-        levelStatus = MapLevelStatus.level7;
+        levelStatus = MapLevelStatus.level2;
 
     }
 

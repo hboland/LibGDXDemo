@@ -34,16 +34,10 @@ public class World1_BossFightScreen implements Screen{
     OrthographicCamera camera;
     ExtendViewport viewport;
     TextureAtlas textureAtlas;
+    TextureAtlas textureAtlas2;
     TextureAtlas jimmyTextureAtlas;
-    TextureAtlas aiEmuTextureAtlas;
-    TextureAtlas jimmyAttackTextureAtlas;
-    TextureAtlas jimmyAbsorbTextureAtlas;
-    TextureAtlas mainGameTextureAtlas;
 
-    Animation<TextureRegion> jimmyAbsorbAnimation;
-    Animation<TextureRegion> jimmyAttackAnimation;
     Animation<TextureRegion> jimmyAnimation;
-    Animation<TextureRegion> aiEmuAnimation;
     final HashMap<String, Sprite> sprites = new HashMap<String, Sprite>();
     float jimmyX = 100;
     float jimmyY = 100;
@@ -94,42 +88,23 @@ public class World1_BossFightScreen implements Screen{
     Rectangle laserRec9;
     Rectangle laserRectangles[] = {laserRec1, laserRec2, laserRec3, laserRec4, laserRec5, laserRec6, laserRec7, laserRec8, laserRec9};
 
-    Rectangle testRec = new Rectangle(0,0,100, 100);
-    Rectangle testRec2 = new Rectangle(0,250,100, 100);
-    Rectangle testRec3 = new Rectangle(400,0,100, 100);
-    Rectangle testRec4 = new Rectangle(400, 250, 100, 100);
-
-    int i =0;
-
-
-    float emuTime = 0;
 
     //MyGdxGame constructor
     MyGdxGame game;
     Level level;
 
 
-    public World1_BossFightScreen(MyGdxGame game){//}, Level level){
+    public World1_BossFightScreen(MyGdxGame game){
         this.game = game;
-        this.level = level;
-
-        //mainSong = level.getSong();
 
         camera = new OrthographicCamera();
         viewport = new ExtendViewport(500, 350, camera);
 
-        jimmyTextureAtlas = new TextureAtlas("jimmy in space walk.txt");
-        //aiEmuTextureAtlas = new TextureAtlas("Normal Jimmy.txt");
+        jimmyTextureAtlas = new TextureAtlas("jimmy skywalker walk.txt");
         textureAtlas = new TextureAtlas("world1_bossfight.txt");
-        //jimmyAttackTextureAtlas = new TextureAtlas("Jimmy in space attack.txt");
-        //jimmyAbsorbTextureAtlas = new TextureAtlas("Jimmy in space absorb.txt");
 
         jimmyAnimation = new Animation<TextureRegion>(0.1f, jimmyTextureAtlas.getRegions());
-        //aiEmuAnimation = new Animation<TextureRegion>(0.1f, aiEmuTextureAtlas.getRegions());
-        //jimmyAttackAnimation = new Animation<TextureRegion>(0.1f, jimmyAttackTextureAtlas.getRegions());
-        //jimmyAbsorbAnimation = new Animation<TextureRegion>(0.1f, jimmyAbsorbTextureAtlas.getRegions());
-        addSprites();
-        textureAtlas = new TextureAtlas("BossFight2.txt");
+        textureAtlas2 = new TextureAtlas("BossFight2.txt");
         addSprites();
 
         sprites.get("zeroLives").setSize(75,75);
@@ -166,6 +141,13 @@ public class World1_BossFightScreen implements Screen{
             Sprite sprite = textureAtlas.createSprite(region.name);
 
             sprites.put(region.name, sprite);
+
+            Array<TextureAtlas.AtlasRegion> regions2 = textureAtlas2.getRegions();
+            for (TextureAtlas.AtlasRegion region2 : regions2) {
+                Sprite sprite2 = textureAtlas2.createSprite(region2.name);
+
+                sprites.put(region2.name, sprite2);
+            }
         }
     }
 
@@ -187,16 +169,10 @@ public class World1_BossFightScreen implements Screen{
 
         boolean animated = false;
         boolean aiAnimated;
-        /*boolean isOverlapping;
-        boolean isOverlapping2;
-        boolean isOverlapping3;
-        boolean isOverlapping4;*/
+
 
         jimmyMovingX = false;
         jimmyMovingY = false;
-
-
-        // jimmySprite = new Sprite(new Texture(files.internal("Normal Jimmy.png")));
 
         game.batch.begin();
 
@@ -310,7 +286,7 @@ public class World1_BossFightScreen implements Screen{
                     jimmyMovingX = true;
 
 
-                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy in space").getWidth() - 96, (int) sprites.get("Jimmy in space").getHeight() - 64);
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy skywalker").getWidth() - 96, (int) sprites.get("Jimmy skywalker").getHeight() - 64);
 
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -321,7 +297,7 @@ public class World1_BossFightScreen implements Screen{
                     animated = true;
 
 
-                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy in space").getWidth() - 96, (int) sprites.get("Jimmy in space").getHeight() - 64);
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy skywalker").getWidth() - 96, (int) sprites.get("Jimmy skywalker").getHeight() - 64);
 
                 }
             }
@@ -333,7 +309,7 @@ public class World1_BossFightScreen implements Screen{
                     jimmyMovingY = true;
 
 
-                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy in space").getWidth() - 96, (int) sprites.get("Jimmy in space").getHeight() - 64);
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy skywalker").getWidth() - 96, (int) sprites.get("Jimmy skywalker").getHeight() - 64);
 
                 }
             } else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -343,17 +319,16 @@ public class World1_BossFightScreen implements Screen{
                     animated = true;
 
 
-                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy in space").getWidth() - 96, (int) sprites.get("Jimmy in space").getHeight() - 64);
+                    jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy skywalker").getWidth() - 96, (int) sprites.get("Jimmy skywalker").getHeight() - 64);
 
                 }
             }
 
-
             elapsedTime += Gdx.graphics.getDeltaTime();
 
             if (animated == false) {
-                drawSprite("Jimmy in space", jimmyX, jimmyY);
-                jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy in space").getWidth() - 96, (int) sprites.get("Jimmy in space").getHeight() - 64);
+                drawSprite("Jimmy skywalker", jimmyX, jimmyY);
+                jimmyRectangle = new Rectangle(jimmyX + 32, jimmyY + 64, (int) sprites.get("Jimmy skywalker").getWidth() - 96, (int) sprites.get("Jimmy skywalker").getHeight() - 64);
             }
 
 
@@ -394,7 +369,6 @@ public class World1_BossFightScreen implements Screen{
                     }
                 }
 
-
                 // laser 2
                 if (laser_2 == false & elapsedTime - laserTime > 0.5f) {
                     if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
@@ -417,7 +391,6 @@ public class World1_BossFightScreen implements Screen{
                             drawSprite("death star hit", boss.getX(), boss.getY());
                             bossHit++;
                         }
-                        //laserTime = elapsedTime;
                     }
                 }
 
@@ -443,7 +416,6 @@ public class World1_BossFightScreen implements Screen{
                             bossHit++;}
 
                         laser_3 = false;
-                        //laserTime = elapsedTime;d
                     }
                 }
 
@@ -462,7 +434,6 @@ public class World1_BossFightScreen implements Screen{
 
         }
         else{ // lives = 0
-            // draw dead emu here drawSprite("dead");
             if (Gdx.input.getX() < 600  && Gdx.input.getX() > 440 && Gdx.input.getY() < 250 && Gdx.input.getY() > 150 ){
                 drawSprite("retryActive",210,200);
                 if (Gdx.input.isTouched()){

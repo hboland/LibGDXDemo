@@ -14,7 +14,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.entities.LevelStatus;
 import com.mygdx.game.entities.MapLevelStatus;
-import com.mygdx.game.entities.World1;
 import com.mygdx.game.entities.World2;
 
 
@@ -91,7 +90,7 @@ public class MainMenuScreen implements Screen {
 
         mainSong.play();
 
-        drawSprite("New Piskel-1.png",350,400);
+        drawSprite("game title",250,300);
 
         TextureRegion currentFrame = jimmyAnimation.getKeyFrame(elapsedTime, true);
 
@@ -127,7 +126,7 @@ public class MainMenuScreen implements Screen {
             drawSprite("emupedia",250,200);
         }
 
-//wxit
+//exit
         if (Gdx.input.getX() < 250 + (sprites.get("active exit").getWidth()-26)*2 && Gdx.input.getX() > 300 && game.HEIGHT - Gdx.input.getY() < 140 + sprites.get("active exit").getHeight() && game.HEIGHT - Gdx.input.getY() > sprites.get("active exit").getHeight() + 70) {
             drawSprite("active exit",250,125);
             if (Gdx.input.isTouched()){

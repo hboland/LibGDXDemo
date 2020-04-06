@@ -37,7 +37,7 @@ public class World1_Level7 implements Level {
 
         walkingTextureAtlas = new TextureAtlas("jimmy in space walk.txt");
         textureAtlas = new TextureAtlas("World1_Level7.txt");
-        evolveSheet = new Texture(Gdx.files.internal("jimmy in space evolution.png"));
+        evolveSheet = new Texture(Gdx.files.internal("skywalker evolution.png"));
 
         jimmyName = "Jimmy in space";
         jimmyAttackName = "Jimmy in space attack";
